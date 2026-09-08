@@ -77,13 +77,13 @@ export function Contact() {
                                 <span className="font-label text-xs uppercase tracking-[0.3em] font-bold text-foreground dark:text-[#e5e2e1]/60">System_Endpoints</span>
                             </div>
 
-                            <a href="mailto:siddharthkaulagi@gmail.com" className="group flex items-center gap-6 p-6 rounded-2xl bg-white dark:bg-[#201f1f] border border-black/5 dark:border-white/5 hover:border-cyan-500/20 dark:hover:border-[#ff5f1f]/20 transition-all duration-500 shadow-sm hover:shadow-xl">
+                            <a href="mailto:siddharthengineer08@gmail.com" className="group flex items-center gap-6 p-6 rounded-2xl bg-white dark:bg-[#201f1f] border border-black/5 dark:border-white/5 hover:border-cyan-500/20 dark:hover:border-[#ff5f1f]/20 transition-all duration-500 shadow-sm hover:shadow-xl">
                                 <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#1c1b1b] border border-black/5 dark:border-white/5 group-hover:scale-110 transition-transform duration-500 shadow-inner">
                                     <Mail size={24} className="text-cyan-600 dark:text-[#ffb59c]" />
                                 </div>
                                 <div className="flex-1 overflow-hidden">
                                     <h4 className="font-headline font-bold text-foreground dark:text-[#e5e2e1] mb-1">Email Terminal</h4>
-                                    <p className="font-label text-[10px] uppercase tracking-widest text-muted-foreground dark:text-[#e5e2e1]/40 transition-colors group-hover:text-cyan-600 dark:group-hover:text-[#ffb59c] truncate">siddharthkaulagi@gmail.com</p>
+                                    <p className="font-label text-[10px] uppercase tracking-widest text-muted-foreground dark:text-[#e5e2e1]/40 transition-colors group-hover:text-cyan-600 dark:group-hover:text-[#ffb59c] truncate">siddharthengineer08@gmail.com</p>
                                 </div>
                                 <ArrowUpRight size={20} className="text-muted-foreground/30 opacity-0 group-hover:opacity-100 transition-all duration-500 -translate-y-2 group-hover:translate-y-0" />
                             </a>

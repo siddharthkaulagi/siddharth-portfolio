@@ -6,6 +6,7 @@ import { Github, Linkedin, ArrowRight, Hexagon, Terminal as TerminalIcon, X, Quo
 import Image from "next/image";
 import { IndustrialBackground } from "@/components/IndustrialBackground";
 import { Terminal, ONE_PIECE_QUOTES } from "@/components/Terminal";
+import { VisitorCounter } from "@/components/VisitorCounter";
 
 export function Hero({
     isTerminalOpen,
@@ -97,18 +98,18 @@ export function Hero({
                             transition={{ delay: 0.65, duration: 0.7 }}
                             className="font-label text-[10px] sm:text-[11px] uppercase tracking-[0.25em] font-black text-muted-foreground dark:text-[#e5e2e1]/50 max-w-xl leading-relaxed"
                         >
-                            Supply Chain & Operations · Lean Systems · Forage Virtual Programs · Data-Driven Decision Making
+                            Supply Chain · Lean Systems · Industrial Engineering · Project Management · Data-Driven Decision Making
                         </motion.p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                         <div className="space-y-6">
                             <p className="font-body text-base lg:text-lg text-muted-foreground dark:text-[#e5e2e1]/70 max-w-md leading-relaxed">
-                                Optimizing complex systems through <span className="text-foreground dark:text-white font-bold">industrial intelligence</span> and <span className="text-foreground dark:text-white font-bold">data-driven orchestration</span>.
+                                Optimizing complex systems through <span className="text-foreground dark:text-white font-bold">industrial intelligence</span>, <span className="text-foreground dark:text-white font-bold">project management</span>, and <span className="text-foreground dark:text-white font-bold">data-driven orchestration</span>.
                             </p>
 
                             <div className="flex flex-wrap gap-2">
-                                {["2 Forage Sims", "6 Certifications", "B.E. IEM @ BMS", "Open to Roles"].map((chip) => (
+                                {["Supply Chain", "Lean Systems", "Project Management", "Open to Roles"].map((chip) => (
                                     <span
                                         key={chip}
                                         className="font-label text-[9px] uppercase tracking-widest font-black px-3 py-1.5 rounded-full bg-white dark:bg-[#1c1b1b] border border-black/5 dark:border-white/5 text-muted-foreground dark:text-[#e5e2e1]/50"
@@ -117,6 +118,7 @@ export function Hero({
                                     </span>
                                 ))}
                             </div>
+                            <VisitorCounter />
 
                             <div className="flex flex-wrap items-center gap-4">
                                 <motion.a
@@ -136,7 +138,18 @@ export function Hero({
                                     Projects
                                 </motion.a>
 
-                                <a href="https://drive.google.com/file/d/1K17iyrLkLaXjdFCfwDWIo6WSJqlwJDae/view?usp=sharing" target="_blank" rel="noreferrer" className="group flex flex-col gap-1 text-cyan-700 dark:text-[#ff4d00] font-headline font-black text-sm">
+                                <a
+                                    href="https://drive.google.com/file/d/1K17iyrLkLaXjdFCfwDWIo6WSJqlwJDae/view?usp=sharing"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={() => {
+                                        fetch("/api/resume-download", {
+                                            method: "POST",
+                                            keepalive: true,
+                                        }).catch(console.error);
+                                    }}
+                                    className="group flex flex-col gap-1 text-cyan-700 dark:text-[#ff4d00] font-headline font-black text-sm"
+                                >
                                     <span className="tracking-tight">Get_Resume</span>
                                     <div className="w-0 h-0.5 bg-cyan-700 dark:bg-[#ff4d00] group-hover:w-full transition-all duration-500" />
                                 </a>

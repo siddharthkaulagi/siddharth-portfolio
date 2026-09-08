@@ -268,6 +268,16 @@ export function Terminal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
             </div>
 
             <div>
+              <p className="text-orange-400 font-bold mb-2">Project Management</p>
+              <ul className="list-none pl-4 space-y-1 text-slate-300">
+                <li>- Project Planning & Coordination</li>
+                <li>- Stakeholder Communication</li>
+                <li>- Timeline & Task Tracking</li>
+                <li>- Continuous Improvement Initiatives</li>
+              </ul>
+            </div>
+
+            <div>
               <p className="text-orange-400 font-bold mb-2">Data & Decision Making</p>
               <ul className="list-none pl-4 space-y-1 text-slate-300">
                 <li>- Data Analysis (Excel, Power BI)</li>
@@ -340,7 +350,7 @@ export function Terminal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
       ),
       contact: (
         <div className="space-y-2">
-          <p><span className="text-cyan-400 font-bold">Email:</span> siddarthkaulagi90@gmail.com</p>
+          <p><span className="text-cyan-400 font-bold">Email:</span> siddharthengineer08@gmail.com</p>
           <p><span className="text-cyan-400 font-bold">Location:</span> Karnataka, India</p>
           <p><span className="text-cyan-400 font-bold">Mobile:</span> +91 8050463960</p>
         </div>

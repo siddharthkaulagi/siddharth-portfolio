@@ -197,6 +197,12 @@ export function Experience() {
                         href={RESUME_URL}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => {
+                            fetch("/api/resume-download", {
+                                method: "POST",
+                                keepalive: true,
+                            }).catch(console.error);
+                        }}
                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-black dark:bg-gradient-to-r dark:from-[#ff4d00] dark:to-[#ff8c00] text-white font-headline font-black text-sm uppercase tracking-wider hover:opacity-90 transition-opacity shrink-0"
                     >
                         <FileText size={18} />

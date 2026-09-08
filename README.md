@@ -63,6 +63,25 @@ Built on a Sunday afternoon with no plan — just curiosity, basic tech literacy
 
 ---
 
+## 📊 PORTFOLIO ANALYTICS
+
+The portfolio displays a session-based profile visitor count and sends a Resend email whenever someone opens a resume link.
+
+For a persistent counter on Vercel, add these environment variables:
+
+```env
+UPSTASH_REDIS_REST_URL=...
+UPSTASH_REDIS_REST_TOKEN=...
+PORTFOLIO_VISITOR_START=128
+RESEND_API_KEY=...
+RESEND_FROM_EMAIL=Portfolio Notifications <notifications@your-verified-domain.com>
+RESEND_TO_EMAIL=your-email@example.com
+```
+
+The `RESEND_FROM_EMAIL` address must be verified in Resend. Without Upstash/Vercel KV, the counter still works during the running server process but will reset when the server restarts.
+
+---
+
 ## 📂 PROJECT FILES
 
 | File | Description |

@@ -113,7 +113,7 @@ export function About() {
                                     I am an <strong className="text-foreground dark:text-white">Industrial Engineering & Management</strong> student with a passion for optimizing the physical world through digital intelligence.
                                 </p>
                                 <p className="font-body text-muted-foreground dark:text-[#e5e2e1]/70 leading-relaxed text-lg">
-                                    Specialized in <strong className="text-cyan-600 dark:text-cyan-400">supply chain orchestration</strong>, <strong className="text-orange-600 dark:text-[#ff5f1f]">Lean Manufacturing</strong>, and <strong className="text-blue-600 dark:text-[#ffb59c]">Data-Driven Decision Systems</strong>.
+                                    Interested in <strong className="text-cyan-600 dark:text-cyan-400">supply chain orchestration</strong>, <strong className="text-orange-600 dark:text-[#ff5f1f]">Lean Manufacturing</strong>, <strong className="text-blue-600 dark:text-[#ffb59c]">Project Management</strong>, and <strong className="text-blue-600 dark:text-[#ffb59c]">Data-Driven Decision Systems</strong>.
                                 </p>
                             </div>
                         </AboutCard>
