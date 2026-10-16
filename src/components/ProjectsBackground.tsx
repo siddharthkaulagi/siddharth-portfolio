@@ -4,81 +4,47 @@ import { motion } from "framer-motion";
 
 export function ProjectsBackground() {
     return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-15 dark:opacity-10">
-            {/* Git Commits Flowing */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20 dark:opacity-15">
             {[...Array(5)].map((_, i) => (
                 <motion.div
                     key={`commit-${i}`}
                     className="absolute"
-                    initial={{ x: "-10%", y: `${30 + i * 10}%` }}
+                    initial={{ x: "-10%", y: `${25 + i * 12}%` }}
                     animate={{ x: "110%" }}
                     transition={{
-                        duration: 20 + i * 3,
+                        duration: 22 + i * 3,
                         repeat: Infinity,
                         delay: i * 4,
-                        ease: "linear"
+                        ease: "linear",
                     }}
                 >
                     <div className="flex items-center space-x-2">
-                        <div className="w-3 h-3 rounded-full bg-green-400/60 border border-green-300/40" />
-                        <div className="w-16 h-1 bg-cyan-400/40" />
-                        <div className="w-3 h-3 rounded-full bg-cyan-400/60 border border-cyan-300/40" />
+                        <div className="w-3 h-3 rounded-full bg-[#2D6A4F]/60 border border-[#74C69D]/50" />
+                        <div className="w-16 h-0.5 bg-[#2D6A4F]/40" />
+                        <div className="w-3 h-3 rounded-full bg-[#C85A32]/60 border border-[#C85A32]/40" />
                     </div>
                 </motion.div>
             ))}
 
-            {/* Deployment Rockets */}
-            {[...Array(3)].map((_, i) => (
-                <motion.div
-                    key={`rocket-${i}`}
-                    className="absolute text-2xl"
-                    initial={{
-                        y: "100%",
-                        x: `${25 + i * 25}%`,
-                        rotate: -45
-                    }}
-                    animate={{
-                        y: "-20%",
-                        opacity: [0, 1, 1, 0]
-                    }}
-                    transition={{
-                        duration: 8,
-                        repeat: Infinity,
-                        delay: i * 6,
-                        ease: "easeInOut"
-                    }}
-                >
-                    <div className="relative">
-                        <div className="text-orange-400/60">🚀</div>
-                        <motion.div
-                            className="absolute top-6 left-0 w-1 h-8 bg-gradient-to-b from-orange-400/60 to-transparent"
-                            animate={{ opacity: [0.3, 0.8, 0.3] }}
-                            transition={{ duration: 0.5, repeat: Infinity }}
-                        />
-                    </div>
-                </motion.div>
-            ))}
-
-            {/* Code Review Checkmarks */}
             {[...Array(6)].map((_, i) => (
                 <motion.div
                     key={`check-${i}`}
-                    className="absolute w-6 h-6 border-2 border-green-400/50 rounded-full flex items-center justify-center"
+                    className="absolute w-6 h-6 border border-[#2D6A4F]/50 rounded-full flex items-center justify-center bg-[#D8F3DC]/30 dark:bg-[#1B4332]/30"
                     style={{
                         left: `${15 + i * 15}%`,
-                        top: `${20 + (i % 2) * 50}%`
+                        top: `${20 + (i % 2) * 50}%`,
                     }}
                     animate={{
-                        scale: [1, 1.3, 1],
-                        opacity: [0.3, 0.7, 0.3]
+                        scale: [1, 1.25, 1],
+                        opacity: [0.25, 0.6, 0.25],
                     }}
                     transition={{
-                        duration: 3,
+                        duration: 3.5,
                         repeat: Infinity,
-                        delay: i * 0.5
+                        delay: i * 0.5,
                     }}
                 >
-                    <span className="text-green-400/60 text-sm">✓</span>
+                    <span className="text-[#2D6A4F] dark:text-[#74C69D] text-xs font-mono font-bold">✓</span>
                 </motion.div>
             ))}
         </div>

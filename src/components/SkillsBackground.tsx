@@ -5,8 +5,7 @@ import { useState, useEffect } from "react";
 
 export function SkillsBackground() {
     const [mounted, setMounted] = useState(false);
-    const codeSymbols = ['{ }', '< />', '[ ]', '( )', '=>', '&&', '||', '++'];
-    const binaryDigits = ['0', '1'];
+    const symbols = ["ABC/XYZ", "MAPE", "DAX", "EOQ", "JIT", "5S", "GD&T", "RAG"];
 
     useEffect(() => {
         setMounted(true);
@@ -15,57 +14,31 @@ export function SkillsBackground() {
     if (!mounted) return null;
 
     return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-15 dark:opacity-10">
-            {/* Floating Code Symbols */}
-            {[...Array(12)].map((_, i) => (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-20 dark:opacity-12">
+            {[...Array(8)].map((_, i) => (
                 <motion.div
-                    key={`code-${i}`}
-                    className="absolute text-cyan-400/60 font-mono text-lg font-bold"
+                    key={`sym-${i}`}
+                    className="absolute text-[#2D6A4F]/60 dark:text-[#74C69D]/50 font-mono text-xs font-bold tracking-widest"
                     initial={{
                         y: "100%",
-                        x: `${Math.random() * 100}%`,
-                        opacity: 0
+                        x: `${10 + i * 11}%`,
+                        opacity: 0,
                     }}
                     animate={{
                         y: "-20%",
                         opacity: [0, 0.6, 0.6, 0],
-                        x: `${Math.random() * 100}%`
                     }}
                     transition={{
-                        duration: 20 + Math.random() * 10,
+                        duration: 22 + i * 2,
                         repeat: Infinity,
-                        delay: i * 1.5,
-                        ease: "linear"
+                        delay: i * 1.8,
+                        ease: "linear",
                     }}
                 >
-                    {codeSymbols[i % codeSymbols.length]}
+                    [{symbols[i % symbols.length]}]
                 </motion.div>
             ))}
 
-            {/* Binary Code Rain */}
-            {[...Array(8)].map((_, i) => (
-                <motion.div
-                    key={`binary-${i}`}
-                    className="absolute flex flex-col space-y-2"
-                    style={{ left: `${10 + i * 12}%` }}
-                    initial={{ y: "-20%" }}
-                    animate={{ y: "120%" }}
-                    transition={{
-                        duration: 15,
-                        repeat: Infinity,
-                        delay: i * 2,
-                        ease: "linear"
-                    }}
-                >
-                    {[...Array(6)].map((_, j) => (
-                        <span key={j} className="text-green-400/40 font-mono text-sm">
-                            {binaryDigits[Math.floor(Math.random() * 2)]}
-                        </span>
-                    ))}
-                </motion.div>
-            ))}
-
-            {/* Tech Connection Lines */}
             <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
                 {[...Array(4)].map((_, i) => (
                     <g key={`line-${i}`}>
@@ -74,11 +47,11 @@ export function SkillsBackground() {
                             y1="20%"
                             x2={`${30 + i * 20}%`}
                             y2="80%"
-                            stroke="rgba(0, 240, 255, 0.2)"
+                            stroke="rgba(45, 106, 79, 0.18)"
                             strokeWidth="1"
-                            strokeDasharray="2,2"
+                            strokeDasharray="3,3"
                         >
-                            <animate attributeName="stroke-dashoffset" from="0" to="4" dur="2s" repeatCount="indefinite" />
+                            <animate attributeName="stroke-dashoffset" from="0" to="6" dur="2s" repeatCount="indefinite" />
                         </line>
                     </g>
                 ))}

@@ -20,8 +20,9 @@ export function ThemeToggle() {
     return (
         <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="relative p-2 rounded-full bg-muted hover:bg-muted/80 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 border border-border dark:border-slate-700 transition-colors"
+            className="relative p-2.5 rounded-xl bg-[#ECE8DD] hover:bg-[#D8F3DC] dark:bg-[#1A1F1C] dark:hover:bg-[#1B4332] border border-black/10 dark:border-white/10 transition-colors cursor-pointer"
             aria-label="Toggle theme"
+            title="Switch between Editorial Cream Light & Obsidian Sage Dark"
         >
             <motion.div
                 initial={false}
@@ -29,10 +30,10 @@ export function ThemeToggle() {
                     scale: theme === "dark" ? 1 : 0,
                     rotate: theme === "dark" ? 0 : 180,
                 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.25 }}
                 className="absolute inset-0 flex items-center justify-center"
             >
-                <Moon className="h-5 w-5 text-cyan-400" />
+                <Moon className="h-4 w-4 text-[#74C69D]" />
             </motion.div>
             <motion.div
                 initial={false}
@@ -40,13 +41,12 @@ export function ThemeToggle() {
                     scale: theme === "light" ? 1 : 0,
                     rotate: theme === "light" ? 0 : -180,
                 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.25 }}
                 className="flex items-center justify-center"
             >
-                <Sun className="h-5 w-5 text-orange-500" />
+                <Sun className="h-4 w-4 text-[#2D6A4F]" />
             </motion.div>
-            {/* Invisible placeholder to maintain size */}
-            <div className="w-5 h-5 opacity-0"></div>
+            <div className="w-4 h-4 opacity-0"></div>
         </button>
     );
 }

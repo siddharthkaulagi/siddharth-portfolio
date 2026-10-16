@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useSpring } from "framer-motion";
-import { Menu, X, Github, Linkedin, Hexagon } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, Github, Linkedin, Hexagon, Terminal, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navLinks = [
     { name: "Home", href: "#hero" },
+    { name: "Simulators", href: "#simulations", short: "Sims" },
     { name: "About", href: "#about" },
     { name: "Experience", href: "#experience", short: "Exp" },
     { name: "Projects", href: "#projects" },
@@ -19,24 +20,6 @@ const navLinks = [
     { name: "Contact", href: "#contact" },
 ];
 
-function BorderBeam({ className }: { className?: string }) {
-    return (
-        <div className={cn("absolute inset-0 pointer-events-none rounded-[32px] overflow-hidden p-[1.5px]", className)}>
-            <div className="absolute inset-0 rounded-[32px] overflow-hidden">
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    className="absolute w-[400%] h-[400%] top-[-150%] left-[-150%] origin-center"
-                    style={{
-                        background: "conic-gradient(from 0deg, transparent 0deg, transparent 300deg, white 330deg, #94a3b8 345deg, white 355deg, transparent 360deg)"
-                    }}
-                />
-            </div>
-            <div className="absolute inset-[1.5px] bg-white dark:bg-[#131212] rounded-[30.5px] shadow-[inset_0_0_15px_rgba(255,255,255,0.05)]" />
-        </div>
-    );
-}
-
 function SocialLink({ href, children, label }: { href: string; children: React.ReactNode; label: string }) {
     return (
         <a
@@ -44,44 +27,10 @@ function SocialLink({ href, children, label }: { href: string; children: React.R
             target="_blank"
             rel="noopener noreferrer"
             aria-label={label}
-            className="p-2 rounded-xl bg-white/10 dark:bg-white/5 border border-white/10 text-muted-foreground dark:text-[#e5e2e1]/50 hover:text-white hover:border-[#ff4d00]/40 transition-colors shrink-0"
+            className="p-2.5 rounded-xl bg-[#ECE8DD] dark:bg-[#1A1F1C] border border-black/10 dark:border-white/10 text-[#111412] dark:text-[#F6F4EE]/80 hover:bg-[#D8F3DC] dark:hover:bg-[#1B4332] hover:border-[#2D6A4F]/40 transition-colors shrink-0"
         >
             {children}
         </a>
-    );
-}
-
-function MagneticIcon({ children, href }: { children: React.ReactNode; href: string }) {
-    const ref = useRef<HTMLAnchorElement>(null);
-    const x = useSpring(0, { damping: 12, stiffness: 150 });
-    const y = useSpring(0, { damping: 12, stiffness: 150 });
-
-    function handleMouseMove(e: React.MouseEvent) {
-        if (!ref.current) return;
-        const { clientX, clientY } = e;
-        const { left, top, width, height } = ref.current.getBoundingClientRect();
-        x.set((clientX - (left + width / 2)) * 0.4);
-        y.set((clientY - (top + height / 2)) * 0.4);
-    }
-
-    function handleMouseLeave() {
-        x.set(0);
-        y.set(0);
-    }
-
-    return (
-        <motion.a
-            ref={ref}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ x, y }}
-            className="p-3 rounded-2xl bg-white/10 dark:bg-white/5 border border-white/10 text-muted-foreground dark:text-[#e5e2e1]/40 hover:text-white hover:border-[#ff4d00]/40 transition-all duration-300 shadow-sm"
-        >
-            {children}
-        </motion.a>
     );
 }
 
@@ -98,7 +47,8 @@ function DecryptLogoText({ text, isHovered }: { text: string; isHovered: boolean
         let iteration = 0;
         const interval = setInterval(() => {
             setDisplayText(
-                text.split("")
+                text
+                    .split("")
                     .map((char, index) => {
                         if (index < iteration) return text[index];
                         return chars[Math.floor(Math.random() * chars.length)];
@@ -107,8 +57,8 @@ function DecryptLogoText({ text, isHovered }: { text: string; isHovered: boolean
             );
 
             if (iteration >= text.length) clearInterval(interval);
-            iteration += 1 / 4;
-        }, 40);
+            iteration += 1 / 3;
+        }, 35);
 
         return () => clearInterval(interval);
     }, [isHovered, text]);
@@ -116,93 +66,89 @@ function DecryptLogoText({ text, isHovered }: { text: string; isHovered: boolean
     return <span>{displayText}</span>;
 }
 
-export function Navbar({ onTerminalClick }: { onTerminalClick?: () => void }) {
+export function Navbar({
+    onTerminalClick,
+    isScmViewOnly = false,
+    onToggleScmView,
+}: {
+    onTerminalClick?: () => void;
+    isScmViewOnly?: boolean;
+    onToggleScmView?: () => void;
+}) {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isLogoHovered, setIsLogoHovered] = useState(false);
 
     useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 50);
+        const handleScroll = () => setIsScrolled(window.scrollY > 40);
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // When Eye Toggle is clicked (isScmViewOnly = true), the entire menu bar disappears
+    // and ONLY the subtle light-opacity Eye Toggle button remains visible!
+    if (isScmViewOnly) {
+        return (
+            <div className="fixed top-5 right-6 z-[100] pointer-events-auto">
+                <button
+                    type="button"
+                    onClick={onToggleScmView}
+                    aria-label="Restore normal portfolio view"
+                    title="Click to restore normal content & menu bar"
+                    className="p-2.5 rounded-xl bg-[#2D6A4F] text-white border border-black/15 dark:border-white/20 shadow-md opacity-35 hover:opacity-100 focus:opacity-100 transition-all duration-300 cursor-pointer flex items-center justify-center"
+                >
+                    <EyeOff size={18} />
+                </button>
+            </div>
+        );
+    }
+
     return (
         <nav
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-4 sm:px-6 pt-4 sm:pt-6",
-                isScrolled ? "scale-[0.98]" : "scale-100"
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 sm:px-6 pt-3 sm:pt-5",
+                isScrolled ? "scale-[0.99]" : "scale-100"
             )}
         >
             <div
                 className={cn(
-                    "max-w-[1440px] mx-auto flex items-center w-full min-w-0 gap-2 sm:gap-3 rounded-[32px] transition-all duration-500 relative",
+                    "max-w-[1440px] mx-auto flex items-center w-full min-w-0 gap-2 sm:gap-3 rounded-3xl transition-all duration-300 relative border",
                     isScrolled
-                        ? "bg-white/90 dark:bg-[#131212]/95 backdrop-blur-2xl shadow-[0_30px_60px_rgba(0,0,0,0.3)] px-5 sm:px-8 py-4 sm:py-5 overflow-hidden"
-                        : "bg-transparent px-3 sm:px-5 py-2 overflow-visible"
+                        ? "bg-[#FDFCF9]/95 dark:bg-[#111412]/95 backdrop-blur-xl border-black/15 dark:border-white/15 shadow-[0_20px_50px_rgba(17,20,18,0.12)] px-5 sm:px-7 py-3.5"
+                        : "bg-[#F6F4EE]/80 dark:bg-[#111412]/80 backdrop-blur-md border-black/10 dark:border-white/10 px-4 sm:px-6 py-3"
                 )}
             >
-                <AnimatePresence>
-                    {isScrolled && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute -inset-1 bg-white/10 dark:bg-white/5 blur-2xl rounded-[40px] -z-10"
-                        />
-                    )}
-                </AnimatePresence>
-
-                <AnimatePresence>
-                    {isScrolled && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="absolute inset-0 z-0"
-                        >
-                            <BorderBeam />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
                 {/* Logo */}
-                <div className="flex items-center gap-2 sm:gap-3 shrink-0 relative z-20 min-w-0">
+                <div className="flex items-center gap-2.5 shrink-0 relative z-20 min-w-0">
                     <Link
                         href="#hero"
-                        className="flex items-center gap-2 sm:gap-3 min-w-0"
+                        className="flex items-center gap-2.5 min-w-0"
                         onMouseEnter={() => setIsLogoHovered(true)}
                         onMouseLeave={() => setIsLogoHovered(false)}
                     >
-                        <div className="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center shrink-0">
-                            <Hexagon className="absolute inset-0 text-cyan-600 dark:text-[#ff4d00] w-full h-full" strokeWidth={1.5} />
-                            <span className="font-headline font-black text-lg sm:text-xl text-foreground dark:text-white relative z-10">
+                        <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#111412] dark:bg-[#74C69D] flex items-center justify-center shrink-0 shadow-xs">
+                            <Hexagon className="absolute inset-1 text-[#74C69D] dark:text-[#081C15] w-auto h-auto opacity-30" strokeWidth={1.5} />
+                            <span className="font-headline font-black text-lg text-[#F6F4EE] dark:text-[#081C15] relative z-10">
                                 S
                             </span>
                         </div>
                         <div className="flex flex-col min-w-0 hidden sm:flex">
-                            <span className="font-headline font-black text-lg xl:text-xl tracking-tighter text-foreground dark:text-[#e5e2e1] uppercase truncate">
+                            <span className="font-headline font-black text-base xl:text-lg tracking-tight text-foreground uppercase truncate">
                                 <DecryptLogoText text="Siddharth" isHovered={isLogoHovered} />
                             </span>
-                            <span className="font-label text-[8px] uppercase tracking-[0.35em] text-muted-foreground dark:text-[#ff4d00]/60 font-black -mt-0.5">
-                                Core_System
+                            <span className="font-mono text-[8px] uppercase tracking-[0.28em] text-[#2D6A4F] dark:text-[#74C69D] font-bold -mt-0.5">
+                                IE_SCM_Systems
                             </span>
                         </div>
                     </Link>
                 </div>
 
-                {/* Desktop nav — centered, compact */}
-                <div className="hidden xl:flex flex-1 min-w-0 items-center justify-center relative z-20 px-2 sm:px-4">
-                    <div className="flex items-center justify-center gap-2 xl:gap-1 2xl:gap-0 max-w-full">
-                        {navLinks.map((link, index) => (
-                            <React.Fragment key={link.name}>
-                            {index > 0 && (
-                                <span
-                                    className="hidden 2xl:block w-px h-3 bg-black/10 dark:bg-white/10 shrink-0"
-                                    aria-hidden
-                                />
-                            )}
+                {/* Desktop nav */}
+                <div className="hidden xl:flex flex-1 min-w-0 items-center justify-center relative z-20 px-2">
+                    <div className="flex items-center justify-center gap-1 max-w-full">
+                        {navLinks.map((link) => (
                             <button
+                                key={link.name}
                                 type="button"
                                 onClick={(e) => {
                                     if (link.name === "Terminal") {
@@ -210,61 +156,81 @@ export function Navbar({ onTerminalClick }: { onTerminalClick?: () => void }) {
                                         onTerminalClick?.();
                                     }
                                 }}
-                                className="relative group shrink-0"
+                                className="relative group shrink-0 cursor-pointer"
                             >
-                                <Link
-                                    href={link.href}
-                                    className={cn(
-                                        "inline-block px-2.5 xl:px-3.5 2xl:px-4 py-1.5 font-label text-[10px] 2xl:text-[11px] uppercase tracking-[0.14em] 2xl:tracking-[0.22em] font-black transition-all whitespace-nowrap",
-                                        "text-cyan-600 dark:text-[#ff4d00] hover:text-cyan-500 dark:hover:text-[#ff8c00]"
-                                    )}
-                                >
-                                    <span className="2xl:hidden">{link.short ?? link.name}</span>
-                                    <span className="hidden 2xl:inline">{link.name === "Certs" ? "Certificates" : link.name}</span>
-                                    <span
+                                {link.name === "Terminal" ? (
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D8F3DC] dark:bg-[#1B4332] text-[#1B4332] dark:text-[#D8F3DC] font-mono text-[10px] uppercase tracking-[0.14em] font-bold border border-[#2D6A4F]/25 hover:bg-[#2D6A4F] hover:text-white transition-all">
+                                        <Terminal size={12} />
+                                        CMD
+                                    </span>
+                                ) : (
+                                    <Link
+                                        href={link.href}
                                         className={cn(
-                                            "absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-500 bg-cyan-600 dark:bg-[#ff4d00]",
-                                            "group-hover:w-full"
+                                            "inline-block px-3 py-1.5 rounded-xl font-mono text-[10px] 2xl:text-[11px] uppercase tracking-[0.14em] font-bold transition-all whitespace-nowrap",
+                                            "text-foreground/80 hover:text-[#2D6A4F] dark:hover:text-[#74C69D] hover:bg-black/5 dark:hover:bg-white/5"
                                         )}
-                                    />
-                                </Link>
+                                    >
+                                        <span className="2xl:hidden">{link.short ?? link.name}</span>
+                                        <span className="hidden 2xl:inline">{link.name === "Certs" ? "Certificates" : link.name}</span>
+                                    </Link>
+                                )}
                             </button>
-                            </React.Fragment>
                         ))}
                     </div>
                 </div>
 
-                {/* Actions — always inside the bar (no magnetic offset) */}
-                <div className="hidden xl:flex items-center gap-3 shrink-0 relative z-20 pl-4 sm:pl-5 ml-2 border-l border-black/10 dark:border-white/10">
+                {/* Actions */}
+                <div className="hidden xl:flex items-center gap-2.5 shrink-0 relative z-20 pl-4 ml-2 border-l border-black/10 dark:border-white/10">
                     <ThemeToggle />
+                    <button
+                        type="button"
+                        onClick={onToggleScmView}
+                        aria-label="Inspect Supply Chain Flow Background"
+                        title="Toggle Supply Chain Flow Canvas View"
+                        className="p-2.5 rounded-xl bg-[#ECE8DD] dark:bg-[#1A1F1C] border border-black/10 dark:border-white/10 text-[#111412] dark:text-[#F6F4EE]/80 hover:bg-[#2D6A4F] hover:text-white dark:hover:bg-[#74C69D] dark:hover:text-[#081C15] transition-colors shrink-0 cursor-pointer"
+                    >
+                        <Eye size={17} />
+                    </button>
                     <SocialLink href="https://github.com/siddharthkaulagi" label="GitHub">
-                        <Github size={18} />
+                        <Github size={17} />
                     </SocialLink>
                     <SocialLink href="https://www.linkedin.com/in/siddharth-kaulagi-041ba4220/" label="LinkedIn">
-                        <Linkedin size={18} />
+                        <Linkedin size={17} />
                     </SocialLink>
                 </div>
 
-                {/* Mobile menu toggle */}
-                <button
-                    type="button"
-                    className="xl:hidden p-3 rounded-2xl bg-white dark:bg-[#201f1f] border border-black/5 dark:border-white/5 text-foreground dark:text-[#e5e2e1] relative z-20 ml-auto shrink-0"
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-                >
-                    {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-                </button>
+                {/* Mobile actions + menu toggle */}
+                <div className="xl:hidden flex items-center gap-2 relative z-20 ml-auto shrink-0">
+                    <button
+                        type="button"
+                        onClick={onToggleScmView}
+                        aria-label="Inspect Supply Chain Flow Background"
+                        title="Toggle Supply Chain Flow Canvas View"
+                        className="p-2.5 rounded-xl bg-[#ECE8DD] dark:bg-[#1A1F1C] border border-black/10 dark:border-white/10 text-foreground"
+                    >
+                        <Eye size={18} />
+                    </button>
+                    <button
+                        type="button"
+                        className="p-2.5 rounded-xl bg-[#ECE8DD] dark:bg-[#1A1F1C] border border-black/10 dark:border-white/10 text-foreground"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+                    >
+                        {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                    </button>
+                </div>
             </div>
 
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                        initial={{ opacity: 0, scale: 0.96, y: -12 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                        className="xl:hidden absolute top-[calc(100%-0.5rem)] left-4 right-4 sm:left-6 sm:right-6 bg-white dark:bg-[#1c1b1b] border border-black/5 dark:border-white/10 rounded-[40px] shadow-2xl z-50 p-8 sm:p-10 mt-2"
+                        exit={{ opacity: 0, scale: 0.96, y: -12 }}
+                        className="xl:hidden absolute top-[calc(100%-0.25rem)] left-4 right-4 sm:left-6 sm:right-6 bg-[#FDFCF9] dark:bg-[#171B18] border border-black/15 dark:border-white/15 rounded-3xl shadow-2xl z-50 p-6 sm:p-8 mt-2"
                     >
-                        <div className="flex flex-col space-y-6">
+                        <div className="grid grid-cols-2 gap-3">
                             {navLinks.map((link) => (
                                 <button
                                     key={link.name}
@@ -276,27 +242,27 @@ export function Navbar({ onTerminalClick }: { onTerminalClick?: () => void }) {
                                         }
                                         setIsMobileMenuOpen(false);
                                     }}
-                                    className="text-left"
+                                    className="text-left p-3 rounded-xl bg-[#F6F4EE] dark:bg-[#111412] border border-black/10 dark:border-white/10"
                                 >
                                     <Link
                                         href={link.href}
-                                        className="font-headline text-3xl sm:text-4xl font-black uppercase tracking-tighter text-cyan-600 dark:text-[#ff4d00] hover:text-cyan-500 dark:hover:text-[#ff8c00]"
+                                        className="font-mono text-xs font-bold uppercase tracking-wider text-foreground hover:text-[#2D6A4F] dark:hover:text-[#74C69D]"
                                     >
                                         {link.name === "Certs" ? "Certificates" : link.name}
                                     </Link>
                                 </button>
                             ))}
-                            <div className="flex items-center justify-between pt-8 border-t border-black/5 dark:border-white/10">
-                                <div className="flex items-center gap-3">
-                                    <MagneticIcon href="https://github.com/siddharthkaulagi">
-                                        <Github size={22} />
-                                    </MagneticIcon>
-                                    <MagneticIcon href="https://www.linkedin.com/in/siddharth-kaulagi-041ba4220/">
-                                        <Linkedin size={22} />
-                                    </MagneticIcon>
-                                </div>
-                                <ThemeToggle />
+                        </div>
+                        <div className="flex items-center justify-between pt-6 mt-6 border-t border-black/10 dark:border-white/10">
+                            <div className="flex items-center gap-3">
+                                <SocialLink href="https://github.com/siddharthkaulagi" label="GitHub">
+                                    <Github size={18} />
+                                </SocialLink>
+                                <SocialLink href="https://www.linkedin.com/in/siddharth-kaulagi-041ba4220/" label="LinkedIn">
+                                    <Linkedin size={18} />
+                                </SocialLink>
                             </div>
+                            <ThemeToggle />
                         </div>
                     </motion.div>
                 )}

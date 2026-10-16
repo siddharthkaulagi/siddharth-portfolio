@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
-import { Outfit, Inter } from "next/font/google";
+import { Outfit, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SmoothScroll } from "@/components/layout/SmoothScroll";
+import { SupportProtocol } from "@/components/SupportProtocol";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -13,13 +15,16 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Siddharth R Kaulagi | Industrial Engineer",
-  description: "Portfolio of Siddharth R Kaulagi - Industrial Engineering",
-};
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+});
 
-import { SmoothScroll } from "@/components/layout/SmoothScroll";
-import { SupportProtocol } from "@/components/SupportProtocol";
+export const metadata: Metadata = {
+  title: "Siddharth R Kaulagi | Industrial Engineering & Supply Chain Systems",
+  description:
+    "Portfolio of Siddharth R Kaulagi — Industrial Engineering & Management, Supply Chain Analytics, Inventory Optimization, Procurement, and AI-Assisted Systems.",
+};
 
 export default function RootLayout({
   children,
@@ -29,18 +34,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${outfit.variable} ${inter.variable} antialiased`}
+        className={`${outfit.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <SmoothScroll />
           <SupportProtocol />
-          {/* Grainy Texture Overlay */}
-          <div className="fixed inset-0 pointer-events-none z-[99999] opacity-[0.03] dark:opacity-[0.05] contrast-150 grayscale" style={{ backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')" }} />
           {children}
         </ThemeProvider>
       </body>

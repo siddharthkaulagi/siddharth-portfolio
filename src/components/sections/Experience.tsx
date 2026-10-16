@@ -24,9 +24,9 @@ import {
 type FilterKey = "all" | ExperienceCategory;
 
 const filters: { key: FilterKey; label: string }[] = [
-    { key: "all", label: "All" },
-    { key: "learning", label: "Learning" },
-    { key: "simulation", label: "Simulations" },
+    { key: "all", label: "All (3)" },
+    { key: "simulation", label: "Job Simulations (2)" },
+    { key: "learning", label: "AI Internship (1)" },
 ];
 
 function ExperienceCard({
@@ -44,73 +44,65 @@ function ExperienceCard({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.45, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
-            className="group relative pl-8 md:pl-12"
+            transition={{ duration: 0.4, delay: index * 0.05 }}
+            className="group relative pl-7 md:pl-11"
         >
             <div
                 className={cn(
-                    "absolute left-0 top-10 w-4 h-4 rounded-full border-2 bg-background dark:bg-[#0f0f0f] z-10",
+                    "absolute left-0 top-10 w-4 h-4 rounded-full border-2 bg-[#F6F4EE] dark:bg-[#111412] z-10",
                     exp.category === "learning"
-                        ? "border-cyan-500 dark:border-[#ffb59c]"
-                        : "border-orange-500 dark:border-[#ff5f1f]"
+                        ? "border-[#C85A32]"
+                        : "border-[#2D6A4F] dark:border-[#74C69D]"
                 )}
             />
             {!isLast && (
-                <div className="absolute left-[7px] top-[3.25rem] w-px h-[calc(100%+2.5rem)] bg-gradient-to-b from-cyan-500/40 via-orange-500/20 to-transparent dark:from-[#ff5f1f]/40" />
+                <div className="absolute left-[7px] top-[3.25rem] w-px h-[calc(100%+2rem)] bg-gradient-to-b from-[#2D6A4F]/40 via-[#C85A32]/25 to-transparent" />
             )}
 
-            <div className="relative p-8 md:p-10 rounded-[40px] bg-card dark:bg-[#1c1b1b] border border-black/5 dark:border-white/5 backdrop-blur-xl overflow-hidden shadow-2xl transition-shadow duration-500 h-full hover:shadow-[0_24px_60px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_24px_60px_rgba(0,0,0,0.45)] hover:border-cyan-500/15 dark:hover:border-[#ff5f1f]/20">
-                <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-cyan-500/[0.04] via-transparent to-orange-500/[0.04] dark:from-[#ff5f1f]/[0.06] dark:to-[#ffb59c]/[0.04]" />
-
-                <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 relative z-10">
-                    <div className="relative h-48 lg:h-auto lg:min-h-[220px] lg:w-72 shrink-0 overflow-hidden rounded-[28px] border border-black/5 dark:border-white/5">
+            <div className="relative p-7 md:p-9 rounded-[36px] bg-white dark:bg-[#171B18] border border-black/12 dark:border-white/12 shadow-xl transition-all duration-300 hover:border-[#2D6A4F] crosshair-card">
+                <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 relative z-10">
+                    <div className="relative h-48 lg:h-auto lg:min-h-[220px] lg:w-72 shrink-0 overflow-hidden rounded-2xl border border-black/10 dark:border-white/10 bg-[#F6F4EE] dark:bg-[#111412]">
                         <Image
                             src={exp.image}
                             alt={`${exp.role} credential`}
                             fill
-                            className="object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                            sizes="(max-width: 1024px) 100vw, 288px"
+                            quality={95}
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                         <a
                             href={exp.certificateLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="absolute bottom-4 right-4 p-3 rounded-xl bg-white dark:bg-[#ffb59c] text-black dark:text-[#5c1900] shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            className="absolute bottom-3 right-3 p-2.5 rounded-xl bg-[#111412] text-white shadow-lg"
                             aria-label="View credential"
                         >
-                            <ArrowUpRight size={20} />
+                            <ArrowUpRight size={18} />
                         </a>
                     </div>
 
-                    <div className="flex-1 space-y-5">
+                    <div className="flex-1 space-y-4">
                         <div className="flex flex-wrap items-start justify-between gap-4">
                             <div className="flex items-start gap-4">
-                                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#131212] border border-black/5 dark:border-white/5">
-                                    <exp.icon className={exp.color} size={28} />
+                                <div className="p-3.5 rounded-2xl bg-[#F6F4EE] dark:bg-[#111412] border border-black/10 dark:border-white/10">
+                                    <exp.icon className={exp.color} size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="font-headline text-2xl md:text-3xl font-black text-foreground dark:text-[#e5e2e1] uppercase tracking-tighter leading-tight group-hover:text-cyan-600 dark:group-hover:text-[#ffb59c] transition-colors duration-300">
+                                    <h3 className="font-headline text-2xl md:text-3xl font-black text-foreground uppercase tracking-tight leading-tight">
                                         {exp.role}
                                     </h3>
-                                    <p className="font-label text-[10px] uppercase tracking-widest font-black text-muted-foreground dark:text-[#e5e2e1]/50 mt-1 flex items-center gap-2">
-                                        <Building2 size={12} />
+                                    <p className="font-mono text-[11px] uppercase tracking-wider font-bold text-[#C85A32] mt-1 flex items-center gap-2">
+                                        <Building2 size={13} />
                                         {exp.organization}
                                     </p>
                                 </div>
                             </div>
-                            <span
-                                className={cn(
-                                    "font-label text-[9px] uppercase tracking-widest font-black px-4 py-2 rounded-full border",
-                                    exp.category === "learning"
-                                        ? "bg-cyan-50 dark:bg-[#131212] text-cyan-700 dark:text-[#ffb59c] border-cyan-500/20 dark:border-[#ff5f1f]/20"
-                                        : "bg-orange-50 dark:bg-[#131212] text-orange-700 dark:text-[#ff5f1f] border-orange-500/20 dark:border-[#ff5f1f]/20"
-                                )}
-                            >
+                            <span className="font-mono text-[10px] uppercase tracking-widest font-bold px-3.5 py-1.5 rounded-full bg-[#D8F3DC] dark:bg-[#1B4332] text-[#1B4332] dark:text-[#D8F3DC] border border-[#2D6A4F]/25">
                                 {exp.type}
                             </span>
                         </div>
 
-                        <p className="font-body text-sm text-muted-foreground dark:text-[#e5e2e1]/60 italic border-l-2 border-cyan-500/30 dark:border-[#ff5f1f]/30 pl-4">
+                        <p className="font-mono text-xs sm:text-sm text-muted-foreground italic border-l-2 border-[#2D6A4F] pl-4">
                             {exp.focus}
                         </p>
 
@@ -118,15 +110,15 @@ function ExperienceCard({
                             {exp.stack.map((tag) => (
                                 <span
                                     key={tag}
-                                    className="font-label text-[9px] uppercase tracking-widest font-black px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-[#131212] text-muted-foreground dark:text-[#e5e2e1]/50 border border-black/5 dark:border-white/5"
+                                    className="font-mono text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-lg bg-[#F6F4EE] dark:bg-[#111412] text-foreground/80 border border-black/10 dark:border-white/10"
                                 >
                                     {tag}
                                 </span>
                             ))}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-4 text-muted-foreground dark:text-[#e5e2e1]/50">
-                            <span className="font-label text-[10px] uppercase tracking-widest font-black flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-4 text-muted-foreground">
+                            <span className="font-mono text-[11px] uppercase tracking-wider font-bold flex items-center gap-1.5">
                                 <Calendar size={14} className={exp.color} />
                                 {exp.period}
                             </span>
@@ -134,20 +126,20 @@ function ExperienceCard({
                                 href={exp.certificateLink}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-label text-[10px] uppercase tracking-widest font-black flex items-center gap-2 text-cyan-600 dark:text-[#ffb59c] hover:underline"
+                                className="font-mono text-[11px] uppercase tracking-wider font-bold flex items-center gap-1.5 text-[#2D6A4F] dark:text-[#74C69D] underline"
                             >
-                                <ExternalLink size={14} />
-                                Credential
+                                <ExternalLink size={13} />
+                                Verify Credential
                             </a>
                         </div>
 
-                        <ul className="space-y-3">
+                        <ul className="space-y-2.5 pt-1">
                             {exp.highlights.map((item, idx) => (
                                 <li
                                     key={idx}
-                                    className="font-body text-muted-foreground dark:text-[#e5e2e1]/70 leading-relaxed text-sm md:text-base flex gap-3"
+                                    className="font-body text-foreground/85 leading-relaxed text-sm md:text-base flex gap-3"
                                 >
-                                    <span className="text-cyan-600 dark:text-[#ff5f1f] font-black mt-1 shrink-0">
+                                    <span className="text-[#2D6A4F] dark:text-[#74C69D] font-bold shrink-0">
                                         ›
                                     </span>
                                     <span>{item}</span>
@@ -172,24 +164,21 @@ export function Experience() {
     return (
         <section
             id="experience"
-            className="relative py-40 bg-slate-50/50 dark:bg-[#0f0f0f] overflow-hidden scroll-mt-28 md:scroll-mt-32"
+            className="relative py-32 bg-transparent overflow-hidden scroll-mt-24"
         >
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-5 pointer-events-none" />
-
-            <div className="max-w-[1600px] mx-auto px-6 md:px-20 relative z-10">
+            <div className="max-w-[1440px] mx-auto px-6 md:px-16 relative z-10">
                 <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-12 gap-8">
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                     >
-                        <label className="font-label text-[10px] uppercase tracking-[0.2em] font-bold text-cyan-600 dark:text-[#ffb59c] mb-4 block flex items-center gap-2">
+                        <label className="font-mono text-[11px] uppercase tracking-[0.25em] font-bold text-[#2D6A4F] dark:text-[#74C69D] mb-3 flex items-center gap-2">
                             <Briefcase size={14} />
-                            Field_Deployment
+                            Field_Deployment // Industry Simulations &amp; Internships
                         </label>
-                        <h2 className="font-headline text-5xl md:text-8xl font-black tracking-tight text-foreground dark:text-[#e5e2e1] uppercase leading-none">
-                            WORK <span className="text-orange-600 dark:text-[#ff5f1f]">EXPERIENCE</span>
+                        <h2 className="font-headline text-5xl md:text-7xl font-black tracking-tight text-foreground uppercase leading-none">
+                            WORK <span className="text-[#2D6A4F] dark:text-[#74C69D]">EXPERIENCE</span>
                         </h2>
                     </motion.div>
 
@@ -203,50 +192,45 @@ export function Experience() {
                                 keepalive: true,
                             }).catch(console.error);
                         }}
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-black dark:bg-gradient-to-r dark:from-[#ff4d00] dark:to-[#ff8c00] text-white font-headline font-black text-sm uppercase tracking-wider hover:opacity-90 transition-opacity shrink-0"
+                        className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#111412] dark:bg-[#74C69D] text-white dark:text-[#081C15] font-mono font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity shrink-0 shadow-md"
                     >
-                        <FileText size={18} />
-                        Download Resume
+                        <FileText size={16} />
+                        Download Official Resume
                     </a>
                 </div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
-                >
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
                     {[
-                        { value: experienceSummary.learningPrograms, label: "Learning Program" },
-                        { value: experienceSummary.virtualSimulations, label: "Forage Simulations" },
-                        { value: experienceSummary.certifications, label: "Certifications" },
-                        { value: "2026", label: "Latest Activity" },
+                        { value: experienceSummary.learningPrograms, label: "AI Internship Track" },
+                        { value: experienceSummary.virtualSimulations, label: "Industry Simulations" },
+                        { value: experienceSummary.certifications, label: "Verified Credentials" },
+                        { value: "2026", label: "Graduation Year" },
                     ].map((stat) => (
                         <div
                             key={stat.label}
-                            className="p-5 rounded-2xl bg-white/80 dark:bg-[#1c1b1b] border border-black/5 dark:border-white/5 text-center"
+                            className="p-5 rounded-2xl bg-white dark:bg-[#171B18] border border-black/10 dark:border-white/10 text-center shadow-sm"
                         >
-                            <p className="font-headline text-3xl font-black text-cyan-600 dark:text-[#ff5f1f]">
+                            <p className="font-headline text-3xl font-black text-[#2D6A4F] dark:text-[#74C69D]">
                                 {stat.value}
                             </p>
-                            <p className="font-label text-[9px] uppercase tracking-widest font-black text-muted-foreground dark:text-[#e5e2e1]/40 mt-1">
+                            <p className="font-mono text-[10px] uppercase tracking-widest font-bold text-muted-foreground mt-1">
                                 {stat.label}
                             </p>
                         </div>
                     ))}
-                </motion.div>
+                </div>
 
-                <div className="flex flex-wrap gap-3 mb-12">
+                <div className="flex flex-wrap gap-2.5 mb-10">
                     {filters.map((f) => (
                         <button
                             key={f.key}
                             type="button"
                             onClick={() => setFilter(f.key)}
                             className={cn(
-                                "font-label text-[10px] uppercase tracking-widest font-black px-5 py-2.5 rounded-full border transition-all duration-300",
+                                "font-mono text-xs uppercase tracking-wider font-bold px-5 py-2.5 rounded-xl border transition-all cursor-pointer",
                                 filter === f.key
-                                    ? "bg-cyan-600 dark:bg-[#ff4d00] text-white border-transparent shadow-lg"
-                                    : "bg-white dark:bg-[#1c1b1b] text-muted-foreground dark:text-[#e5e2e1]/50 border-black/5 dark:border-white/5 hover:border-cyan-500/30"
+                                    ? "bg-[#2D6A4F] dark:bg-[#74C69D] text-white dark:text-[#081C15] border-transparent shadow"
+                                    : "bg-white dark:bg-[#171B18] text-muted-foreground border-black/10 dark:border-white/10 hover:border-[#2D6A4F]"
                             )}
                         >
                             {f.label}
@@ -256,7 +240,7 @@ export function Experience() {
 
                 <div className="relative">
                     <AnimatePresence mode="popLayout">
-                        <div className="grid grid-cols-1 gap-10 lg:gap-12">
+                        <div className="grid grid-cols-1 gap-8">
                             {filtered.map((exp, index) => (
                                 <ExperienceCard
                                     key={exp.id}
@@ -269,10 +253,10 @@ export function Experience() {
                     </AnimatePresence>
                 </div>
 
-                <p className="mt-12 text-center font-label text-[10px] uppercase tracking-widest text-muted-foreground dark:text-[#e5e2e1]/30">
-                    Remote learning completed May 2026 ·{" "}
-                    <Link href="#certificates" className="text-cyan-600 dark:text-[#ffb59c] hover:underline">
-                        View all credentials
+                <p className="mt-10 text-center font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                    All credentials verified ·{" "}
+                    <Link href="#certificates" className="text-[#2D6A4F] dark:text-[#74C69D] font-bold underline">
+                        Inspect all 6 certificates below
                     </Link>
                 </p>
             </div>

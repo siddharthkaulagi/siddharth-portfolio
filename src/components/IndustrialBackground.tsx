@@ -2,291 +2,758 @@
 
 import React, { useEffect, useRef } from "react";
 
-export function IndustrialBackground() {
+interface StageNode {
+    id: string;
+    code: string;
+    title: string;
+    subtitle: string;
+    rx: number;
+    ry: number;
+    accent: "emerald" | "ochre" | "sage";
+    metric: string;
+}
+
+interface TransportCorridor {
+    id: string;
+    fromIdx: number;
+    toIdx: number;
+    mode: "RAIL" | "SHIP" | "AIR" | "TRUCK" | "CONVEYOR" | "VAN";
+    routeLabel: string;
+    cp1x: number;
+    cp1y: number;
+    cp2x: number;
+    cp2y: number;
+    speed: number;
+    vehicleCount: number;
+    colorType: "emerald" | "ochre" | "sage";
+}
+
+const SCM_STAGES: StageNode[] = [
+    {
+        id: "mining",
+        code: "STG_01 // EXTRACTION",
+        title: "RAW EXTRACTION",
+        subtitle: "Ore Quarry & Crusher",
+        rx: 0.08,
+        ry: 0.14,
+        accent: "ochre",
+        metric: "RAW_FEED: 100%",
+    },
+    {
+        id: "sourcing",
+        code: "STG_02 // SOURCING",
+        title: "VENDOR SOURCING",
+        subtitle: "8 Tier-1 Supplier Hubs",
+        rx: 0.31,
+        ry: 0.19,
+        accent: "emerald",
+        metric: "VENDORS: 08 ACTIVE",
+    },
+    {
+        id: "procurement",
+        code: "STG_03 // PROCUREMENT",
+        title: "PROCUREMENT & PORT",
+        subtitle: "SAP S/4HANA · BOM/GD&T",
+        rx: 0.62,
+        ry: 0.15,
+        accent: "sage",
+        metric: "PO_FLOW: 320+ ORD",
+    },
+    {
+        id: "manufacturing",
+        code: "STG_04 // MANUFACTURING",
+        title: "SMART FACTORY & IE",
+        subtitle: "Lean 5S · Kaizen · Robotics",
+        rx: 0.85,
+        ry: 0.44,
+        accent: "ochre",
+        metric: "OEE: 94.8% · ZERO_DEF",
+    },
+    {
+        id: "warehouse",
+        code: "STG_05 // CENTRAL DC",
+        title: "DISTRIBUTION HUB",
+        subtitle: "ABC/XYZ/FSN · 15.56 DSI",
+        rx: 0.48,
+        ry: 0.64,
+        accent: "emerald",
+        metric: "TURNOVER: 23.47x",
+    },
+    {
+        id: "delivery",
+        code: "STG_06 // DELIVERY",
+        title: "CUSTOMER FULFILLMENT",
+        subtitle: "URIP Retail & Last-Mile",
+        rx: 0.14,
+        ry: 0.81,
+        accent: "sage",
+        metric: "OTD: 94.1% · FILL: 96.7%",
+    },
+];
+
+const CORRIDORS: TransportCorridor[] = [
+    {
+        id: "c-rail",
+        fromIdx: 0,
+        toIdx: 1,
+        mode: "RAIL",
+        routeLabel: "HEAVY RAIL CORRIDOR [ORE -> VENDOR]",
+        cp1x: 0.16,
+        cp1y: 0.09,
+        cp2x: 0.23,
+        cp2y: 0.23,
+        speed: 0.0011,
+        vehicleCount: 2,
+        colorType: "ochre",
+    },
+    {
+        id: "c-ship",
+        fromIdx: 1,
+        toIdx: 2,
+        mode: "SHIP",
+        routeLabel: "MARITIME CONTAINER LANE [FOB -> PORT]",
+        cp1x: 0.42,
+        cp1y: 0.08,
+        cp2x: 0.52,
+        cp2y: 0.24,
+        speed: 0.00085,
+        vehicleCount: 2,
+        colorType: "emerald",
+    },
+    {
+        id: "c-air",
+        fromIdx: 1,
+        toIdx: 3,
+        mode: "AIR",
+        routeLabel: "EXPEDITED AIR CARGO [AOG / CRITICAL BOM]",
+        cp1x: 0.55,
+        cp1y: 0.04,
+        cp2x: 0.78,
+        cp2y: 0.16,
+        speed: 0.0018,
+        vehicleCount: 2,
+        colorType: "ochre",
+    },
+    {
+        id: "c-inbound-truck",
+        fromIdx: 2,
+        toIdx: 3,
+        mode: "TRUCK",
+        routeLabel: "INBOUND JIT FREIGHT [PORT -> PLANT]",
+        cp1x: 0.76,
+        cp1y: 0.20,
+        cp2x: 0.88,
+        cp2y: 0.31,
+        speed: 0.0013,
+        vehicleCount: 2,
+        colorType: "emerald",
+    },
+    {
+        id: "c-conveyor",
+        fromIdx: 3,
+        toIdx: 4,
+        mode: "CONVEYOR",
+        routeLabel: "AUTOMATED AGV & PALLET TRANSFER [WIP -> DC]",
+        cp1x: 0.76,
+        cp1y: 0.58,
+        cp2x: 0.62,
+        cp2y: 0.68,
+        speed: 0.0014,
+        vehicleCount: 3,
+        colorType: "sage",
+    },
+    {
+        id: "c-linehaul-truck",
+        fromIdx: 4,
+        toIdx: 5,
+        mode: "TRUCK",
+        routeLabel: "PRIMARY LINEHAUL FLEET [DC -> REGIONAL HUB]",
+        cp1x: 0.36,
+        cp1y: 0.59,
+        cp2x: 0.25,
+        cp2y: 0.72,
+        speed: 0.00125,
+        vehicleCount: 2,
+        colorType: "emerald",
+    },
+    {
+        id: "c-lastmile-van",
+        fromIdx: 4,
+        toIdx: 5,
+        mode: "VAN",
+        routeLabel: "LAST-MILE EV DISPATCH [EXPRESS DELIVERY]",
+        cp1x: 0.41,
+        cp1y: 0.84,
+        cp2x: 0.24,
+        cp2y: 0.89,
+        speed: 0.00165,
+        vehicleCount: 2,
+        colorType: "ochre",
+    },
+];
+
+function cubicPoint(
+    t: number,
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    x3: number,
+    y3: number
+) {
+    const u = 1 - t;
+    const tt = t * t;
+    const uu = u * u;
+    const uuu = uu * u;
+    const ttt = tt * t;
+
+    const x = uuu * x0 + 3 * uu * t * x1 + 3 * u * tt * x2 + ttt * x3;
+    const y = uuu * y0 + 3 * uu * t * y1 + 3 * u * tt * y2 + ttt * y3;
+
+    const dx =
+        3 * uu * (x1 - x0) + 6 * u * t * (x2 - x1) + 3 * tt * (x3 - x2);
+    const dy =
+        3 * uu * (y1 - y0) + 6 * u * t * (y2 - y1) + 3 * tt * (y3 - y2);
+
+    const angle = Math.atan2(dy, dx);
+    return { x, y, angle };
+}
+
+export function IndustrialBackground({
+    fixed = true,
+}: {
+    fixed?: boolean;
+}) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-
         const ctx = canvas.getContext("2d");
         if (!ctx) return;
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        let width = (canvas.width = window.innerWidth);
+        let height = (canvas.height = window.innerHeight);
 
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
+        const handleResize = () => {
+            if (!canvas) return;
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        };
+        window.addEventListener("resize", handleResize);
 
-        // Material Flow Particles - Enhanced
-        class Particle {
-            x: number;
-            y: number;
-            vx: number;
-            vy: number;
-            color: string;
-            size: number;
+        const vehicles: {
+            corridorIdx: number;
+            t: number;
+            speed: number;
+            mode: TransportCorridor["mode"];
+            colorType: TransportCorridor["colorType"];
+            idTag: string;
+        }[] = [];
 
-            constructor() {
-                this.x = -20;
-                this.y = Math.random() * canvasHeight;
-                this.vx = 0.5 + Math.random() * 1.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
+        CORRIDORS.forEach((corridor, cIdx) => {
+            for (let i = 0; i < corridor.vehicleCount; i++) {
+                vehicles.push({
+                    corridorIdx: cIdx,
+                    t: (i / corridor.vehicleCount + cIdx * 0.13) % 1,
+                    speed: corridor.speed * (0.92 + (i % 2) * 0.16),
+                    mode: corridor.mode,
+                    colorType: corridor.colorType,
+                    idTag: `${corridor.mode.slice(0, 3)}-0${i + 1}`,
+                });
+            }
+        });
 
-                const rand = Math.random();
-                if (rand < 0.33) {
-                    this.color = "rgba(255, 170, 0, 0.8)"; // Orange - more visible
-                } else if (rand < 0.66) {
-                    this.color = "rgba(0, 240, 255, 0.8)"; // Cyan - more visible
-                } else {
-                    this.color = "rgba(59, 130, 246, 0.8)"; // Blue - more visible
-                }
+        let phase = 0;
+        let animId: number;
 
-                this.size = 3 + Math.random() * 4; // Larger particles
+        function drawTransportVehicle(
+            ctx: CanvasRenderingContext2D,
+            mode: TransportCorridor["mode"],
+            x: number,
+            y: number,
+            angle: number,
+            strokeColor: string,
+            fillColor: string,
+            accentColor: string,
+            tag: string,
+            phase: number
+        ) {
+            ctx.save();
+            ctx.translate(x, y);
+
+            const flipVertical = Math.abs(angle) > Math.PI / 2;
+            ctx.rotate(angle);
+            if (flipVertical && mode !== "AIR" && mode !== "CONVEYOR") {
+                ctx.scale(1, -1);
             }
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
+            ctx.lineWidth = 1.4;
+            ctx.strokeStyle = strokeColor;
+            ctx.fillStyle = fillColor;
 
-                if (this.x > canvasWidth + 20) {
-                    this.x = -20;
-                    this.y = Math.random() * canvasHeight;
-                }
-            }
-
-            draw(ctx: CanvasRenderingContext2D) {
-                ctx.fillStyle = this.color;
+            if (mode === "SHIP") {
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.moveTo(-20, 4);
+                ctx.lineTo(22, 4);
+                ctx.lineTo(16, 11);
+                ctx.lineTo(-16, 11);
+                ctx.closePath();
                 ctx.fill();
+                ctx.stroke();
 
-                // Enhanced glow
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = this.color;
+                ctx.fillStyle = accentColor;
+                ctx.fillRect(-13, -3, 7, 7);
+                ctx.strokeRect(-13, -3, 7, 7);
+                ctx.fillRect(-5, -3, 7, 7);
+                ctx.strokeRect(-5, -3, 7, 7);
+                ctx.fillStyle = fillColor;
+                ctx.fillRect(3, -5, 6, 9);
+                ctx.strokeRect(3, -5, 6, 9);
+
+                ctx.strokeStyle = accentColor;
+                ctx.beginPath();
+                ctx.moveTo(-22, 8);
+                ctx.lineTo(-29 - Math.sin(phase * 3) * 3, 6);
+                ctx.moveTo(-22, 10);
+                ctx.lineTo(-27 - Math.cos(phase * 3) * 3, 12);
+                ctx.stroke();
+            } else if (mode === "TRUCK") {
+                ctx.fillRect(-18, -6, 22, 11);
+                ctx.strokeRect(-18, -6, 22, 11);
+
+                ctx.fillStyle = accentColor;
+                ctx.beginPath();
+                ctx.moveTo(4, -4);
+                ctx.lineTo(13, -4);
+                ctx.lineTo(16, 0);
+                ctx.lineTo(16, 5);
+                ctx.lineTo(4, 5);
+                ctx.closePath();
                 ctx.fill();
-                ctx.shadowBlur = 0;
+                ctx.stroke();
+
+                ctx.fillStyle = strokeColor;
+                [-13, -8, 1, 11].forEach((wx) => {
+                    ctx.beginPath();
+                    ctx.arc(wx, 6.5, 2.4, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            } else if (mode === "RAIL") {
+                for (let c = -1; c <= 1; c++) {
+                    const cx = c * 15;
+                    ctx.fillStyle = c === 1 ? accentColor : fillColor;
+                    ctx.fillRect(cx - 6, -5, 12, 8);
+                    ctx.strokeRect(cx - 6, -5, 12, 8);
+
+                    ctx.fillStyle = strokeColor;
+                    ctx.beginPath();
+                    ctx.arc(cx - 3, 4.5, 1.8, 0, Math.PI * 2);
+                    ctx.arc(cx + 3, 4.5, 1.8, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.beginPath();
+                ctx.moveTo(-9, -1);
+                ctx.lineTo(-6, -1);
+                ctx.moveTo(6, -1);
+                ctx.lineTo(9, -1);
+                ctx.stroke();
+            } else if (mode === "AIR") {
+                ctx.fillStyle = fillColor;
+                ctx.beginPath();
+                ctx.moveTo(16, 0);
+                ctx.lineTo(8, -2.5);
+                ctx.lineTo(-2, -2.5);
+                ctx.lineTo(-6, -16);
+                ctx.lineTo(-10, -16);
+                ctx.lineTo(-8, -2.5);
+                ctx.lineTo(-15, -2);
+                ctx.lineTo(-18, -7);
+                ctx.lineTo(-20, -7);
+                ctx.lineTo(-18, 0);
+                ctx.lineTo(-20, 7);
+                ctx.lineTo(-18, 7);
+                ctx.lineTo(-15, 2);
+                ctx.lineTo(-8, 2.5);
+                ctx.lineTo(-10, 16);
+                ctx.lineTo(-6, 16);
+                ctx.lineTo(-2, 2.5);
+                ctx.lineTo(8, 2.5);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.strokeStyle = accentColor;
+                ctx.setLineDash([2, 2]);
+                ctx.beginPath();
+                ctx.moveTo(-21, -2);
+                ctx.lineTo(-32, -2);
+                ctx.moveTo(-21, 2);
+                ctx.lineTo(-32, 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            } else if (mode === "CONVEYOR") {
+                ctx.fillStyle = fillColor;
+                ctx.fillRect(-9, -7, 18, 14);
+                ctx.strokeRect(-9, -7, 18, 14);
+                ctx.strokeStyle = accentColor;
+                ctx.beginPath();
+                ctx.moveTo(-5, 0);
+                ctx.lineTo(5, 0);
+                ctx.moveTo(0, -4);
+                ctx.lineTo(0, 4);
+                ctx.stroke();
+            } else if (mode === "VAN") {
+                ctx.fillStyle = fillColor;
+                ctx.beginPath();
+                ctx.moveTo(-12, -5);
+                ctx.lineTo(6, -5);
+                ctx.lineTo(12, 0);
+                ctx.lineTo(12, 5);
+                ctx.lineTo(-12, 5);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = strokeColor;
+                ctx.beginPath();
+                ctx.arc(-7, 6, 2.2, 0, Math.PI * 2);
+                ctx.arc(7, 6, 2.2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+
+            if (width > 768) {
+                ctx.save();
+                ctx.font = "600 8.5px monospace";
+                ctx.fillStyle = strokeColor;
+                ctx.fillText(tag, x + 14, y - 10);
+                ctx.restore();
             }
         }
 
-        const particles: Particle[] = [];
-        for (let i = 0; i < 80; i++) { // More particles
-            particles.push(new Particle());
+        function drawStageNode(
+            ctx: CanvasRenderingContext2D,
+            stage: StageNode,
+            idx: number,
+            isDark: boolean,
+            phase: number
+        ) {
+            const x = stage.rx * width;
+            const y = stage.ry * height;
+
+            const emeraldStroke = isDark
+                ? "rgba(116, 198, 157, 0.55)"
+                : "rgba(45, 106, 79, 0.45)";
+            const ochreStroke = isDark
+                ? "rgba(224, 122, 95, 0.60)"
+                : "rgba(200, 90, 50, 0.50)";
+            const cardFill = isDark
+                ? "rgba(23, 27, 24, 0.85)"
+                : "rgba(253, 252, 249, 0.90)";
+            const textPrimary = isDark
+                ? "rgba(246, 244, 238, 0.78)"
+                : "rgba(17, 20, 18, 0.74)";
+            const textMuted = isDark
+                ? "rgba(163, 173, 166, 0.62)"
+                : "rgba(74, 82, 77, 0.65)";
+
+            const ringColor =
+                stage.accent === "ochre" ? ochreStroke : emeraldStroke;
+
+            ctx.save();
+
+            // Outer pulsing radar ring
+            const pulseR = 26 + Math.sin(phase * 2 + idx) * 5;
+            ctx.strokeStyle = ringColor;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.arc(x, y, pulseR, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Node base circle
+            ctx.fillStyle = cardFill;
+            ctx.strokeStyle = ringColor;
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.arc(x, y, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Custom CAD Icon inside each stage circle
+            ctx.strokeStyle = ringColor;
+            ctx.lineWidth = 1.4;
+            if (stage.id === "mining") {
+                ctx.strokeRect(x - 9, y - 6, 7, 11);
+                ctx.strokeRect(x + 2, y - 8, 7, 13);
+                ctx.beginPath();
+                ctx.moveTo(x - 9, y - 6);
+                ctx.lineTo(x - 5.5, y - 11);
+                ctx.lineTo(x - 2, y - 6);
+                ctx.stroke();
+            } else if (stage.id === "sourcing") {
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.stroke();
+                for (let a = 0; a < 4; a++) {
+                    const ang = (a * Math.PI) / 2 + phase * 0.4;
+                    const nx = x + Math.cos(ang) * 10;
+                    const ny = y + Math.sin(ang) * 10;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(nx, ny);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(nx, ny, 2, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            } else if (stage.id === "procurement") {
+                ctx.beginPath();
+                ctx.moveTo(x - 10, y + 8);
+                ctx.lineTo(x - 6, y - 9);
+                ctx.lineTo(x + 11, y - 9);
+                ctx.moveTo(x + 4, y - 9);
+                ctx.lineTo(x + 4, y + 2);
+                ctx.stroke();
+                ctx.strokeRect(x + 1, y + 2, 6, 5);
+            } else if (stage.id === "manufacturing") {
+                ctx.beginPath();
+                ctx.moveTo(x - 10, y + 8);
+                ctx.lineTo(x - 10, y - 4);
+                ctx.lineTo(x - 3, y + 1);
+                ctx.lineTo(x - 3, y - 4);
+                ctx.lineTo(x + 4, y + 1);
+                ctx.lineTo(x + 4, y - 7);
+                ctx.lineTo(x + 10, y - 7);
+                ctx.lineTo(x + 10, y + 8);
+                ctx.closePath();
+                ctx.stroke();
+            } else if (stage.id === "warehouse") {
+                ctx.strokeRect(x - 9, y - 8, 18, 16);
+                ctx.beginPath();
+                ctx.moveTo(x - 9, y - 2);
+                ctx.lineTo(x + 9, y - 2);
+                ctx.moveTo(x - 9, y + 3);
+                ctx.lineTo(x + 9, y + 3);
+                ctx.moveTo(x, y - 8);
+                ctx.lineTo(x, y + 8);
+                ctx.stroke();
+            } else if (stage.id === "delivery") {
+                ctx.beginPath();
+                ctx.moveTo(x, y - 10);
+                ctx.lineTo(x + 9, y - 4);
+                ctx.lineTo(x + 9, y + 7);
+                ctx.lineTo(x, y + 11);
+                ctx.lineTo(x - 9, y + 7);
+                ctx.lineTo(x - 9, y - 4);
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            // Blueprint Callout Label Box
+            if (width > 640) {
+                const labelX = x + 24;
+                const labelY = y - 18;
+                const boxW = 148;
+                const boxH = 38;
+
+                const finalX =
+                    labelX + boxW > width - 16 ? x - boxW - 24 : labelX;
+
+                ctx.fillStyle = cardFill;
+                ctx.strokeStyle = ringColor;
+                ctx.lineWidth = 1;
+                ctx.fillRect(finalX, labelY, boxW, boxH);
+                ctx.strokeRect(finalX, labelY, boxW, boxH);
+
+                ctx.font = "700 8.5px monospace";
+                ctx.fillStyle = ringColor;
+                ctx.fillText(stage.code, finalX + 6, labelY + 11);
+
+                ctx.font = "700 9.5px sans-serif";
+                ctx.fillStyle = textPrimary;
+                ctx.fillText(stage.title, finalX + 6, labelY + 23);
+
+                ctx.font = "500 8px monospace";
+                ctx.fillStyle = textMuted;
+                ctx.fillText(stage.metric, finalX + 6, labelY + 33);
+            }
+
+            ctx.restore();
         }
 
         function animate() {
             if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, width, height);
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.documentElement.classList.contains("dark");
+            phase += 0.016;
 
-            particles.forEach((particle) => {
-                particle.update();
-                particle.draw(ctx);
+            const emeraldLine = isDark
+                ? "rgba(116, 198, 157, 0.24)"
+                : "rgba(45, 106, 79, 0.22)";
+            const ochreLine = isDark
+                ? "rgba(224, 122, 95, 0.26)"
+                : "rgba(200, 90, 50, 0.24)";
+            const vehicleStroke = isDark
+                ? "rgba(246, 244, 238, 0.78)"
+                : "rgba(17, 20, 18, 0.72)";
+            const emeraldFill = isDark
+                ? "rgba(45, 106, 79, 0.75)"
+                : "rgba(216, 243, 220, 0.92)";
+            const ochreFill = isDark
+                ? "rgba(200, 90, 50, 0.75)"
+                : "rgba(246, 244, 238, 0.95)";
+            const accentEmerald = isDark ? "#74C69D" : "#2D6A4F";
+            const accentOchre = isDark ? "#E07A5F" : "#C85A32";
+
+            // 1. Horizontal automated factory conveyor belt tracks in background
+            [0.29, 0.54, 0.75].forEach((laneY, idx) => {
+                const y = laneY * height;
+                ctx.save();
+                ctx.strokeStyle = isDark
+                    ? "rgba(246, 244, 238, 0.05)"
+                    : "rgba(17, 20, 18, 0.05)";
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+
+                ctx.strokeStyle = isDark
+                    ? "rgba(116, 198, 157, 0.14)"
+                    : "rgba(45, 106, 79, 0.14)";
+                ctx.lineWidth = 1.2;
+                ctx.setLineDash([8, 8]);
+                ctx.lineDashOffset = -phase * 25 * (idx % 2 === 0 ? 1 : -1);
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+                ctx.restore();
             });
 
-            requestAnimationFrame(animate);
+            // 2. Multi-Modal Transport Corridors
+            CORRIDORS.forEach((corridor) => {
+                const from = SCM_STAGES[corridor.fromIdx];
+                const to = SCM_STAGES[corridor.toIdx];
+
+                const x0 = from.rx * width;
+                const y0 = from.ry * height;
+                const x1 = corridor.cp1x * width;
+                const y1 = corridor.cp1y * height;
+                const x2 = corridor.cp2x * width;
+                const y2 = corridor.cp2y * height;
+                const x3 = to.rx * width;
+                const y3 = to.ry * height;
+
+                ctx.save();
+                ctx.strokeStyle =
+                    corridor.colorType === "ochre" ? ochreLine : emeraldLine;
+                ctx.lineWidth = corridor.mode === "RAIL" ? 2.2 : 1.6;
+
+                if (corridor.mode === "RAIL") {
+                    ctx.setLineDash([6, 4]);
+                } else if (corridor.mode === "SHIP") {
+                    ctx.setLineDash([10, 6]);
+                } else if (corridor.mode === "AIR") {
+                    ctx.setLineDash([3, 5]);
+                } else {
+                    ctx.setLineDash([]);
+                }
+
+                ctx.lineDashOffset = -phase * 18;
+                ctx.beginPath();
+                ctx.moveTo(x0, y0);
+                ctx.bezierCurveTo(x1, y1, x2, y2, x3, y3);
+                ctx.stroke();
+
+                if (width > 900) {
+                    const mid = cubicPoint(
+                        0.5,
+                        x0,
+                        y0,
+                        x1,
+                        y1,
+                        x2,
+                        y2,
+                        x3,
+                        y3
+                    );
+                    ctx.font = "600 8px monospace";
+                    ctx.fillStyle = isDark
+                        ? "rgba(163, 173, 166, 0.45)"
+                        : "rgba(74, 82, 77, 0.52)";
+                    ctx.fillText(`[${corridor.mode}]`, mid.x - 16, mid.y - 6);
+                }
+
+                ctx.restore();
+            });
+
+            // 3. Moving Multi-Modal Vehicles
+            vehicles.forEach((v) => {
+                v.t += v.speed;
+                if (v.t > 1) v.t = 0;
+
+                const corridor = CORRIDORS[v.corridorIdx];
+                const from = SCM_STAGES[corridor.fromIdx];
+                const to = SCM_STAGES[corridor.toIdx];
+
+                const pt = cubicPoint(
+                    v.t,
+                    from.rx * width,
+                    from.ry * height,
+                    corridor.cp1x * width,
+                    corridor.cp1y * height,
+                    corridor.cp2x * width,
+                    corridor.cp2y * height,
+                    to.rx * width,
+                    to.ry * height
+                );
+
+                const isOchre = v.colorType === "ochre";
+                drawTransportVehicle(
+                    ctx,
+                    v.mode,
+                    pt.x,
+                    pt.y,
+                    pt.angle,
+                    vehicleStroke,
+                    isOchre ? ochreFill : emeraldFill,
+                    isOchre ? accentOchre : accentEmerald,
+                    v.idTag,
+                    phase
+                );
+            });
+
+            // 4. Draw the 6 End-to-End Supply Chain Stage Nodes
+            SCM_STAGES.forEach((stage, idx) => {
+                drawStageNode(ctx, stage, idx, isDark, phase);
+            });
+
+            animId = requestAnimationFrame(animate);
         }
 
         animate();
 
-        const handleResize = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        };
-
-        window.addEventListener("resize", handleResize);
-
         return () => {
+            cancelAnimationFrame(animId);
             window.removeEventListener("resize", handleResize);
         };
     }, []);
 
     return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-50 dark:opacity-40">
-            {/* Canvas for Material Flow Particles */}
-            <canvas ref={canvasRef} className="absolute inset-0" />
-
-            {/* Conveyor Belt System */}
-            <div className="absolute inset-0">
-                {/* Top Conveyor */}
-                <div className="absolute top-[15%] left-0 w-full h-3 bg-gradient-to-r from-transparent via-slate-400/30 to-transparent overflow-hidden">
-                    <div className="conveyor-line h-full" />
-                </div>
-
-                {/* Moving Boxes on Top Conveyor */}
-                <div className="absolute top-[12.5%] left-0 w-full">
-                    {[...Array(6)].map((_, i) => (
-                        <div
-                            key={`box-top-${i}`}
-                            className="absolute w-10 h-10 border-2 border-cyan-400/60 bg-cyan-500/20 rounded shadow-lg"
-                            style={{
-                                left: `${i * 20}%`,
-                                animation: `conveyor-move 15s linear infinite`,
-                                animationDelay: `${i * 2.5}s`,
-                            }}
-                        >
-                            <div className="absolute inset-1 border border-cyan-400/30" />
-                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-cyan-300 rounded-full" />
-                        </div>
-                    ))}
-                </div>
-
-                {/* Middle Conveyor */}
-                <div className="absolute top-[50%] left-0 w-full h-3 bg-gradient-to-r from-transparent via-orange-400/30 to-transparent overflow-hidden">
-                    <div className="conveyor-line h-full" style={{ animationDuration: '18s' }} />
-                </div>
-
-                {/* Moving Boxes on Middle Conveyor */}
-                <div className="absolute top-[47.5%] left-0 w-full">
-                    {[...Array(5)].map((_, i) => (
-                        <div
-                            key={`box-mid-${i}`}
-                            className="absolute w-12 h-12 border-2 border-orange-400/60 bg-orange-500/20 rounded shadow-lg"
-                            style={{
-                                left: `${i * 25}%`,
-                                animation: `conveyor-move 18s linear infinite`,
-                                animationDelay: `${i * 3.6}s`,
-                            }}
-                        >
-                            <div className="absolute inset-1 border border-orange-400/30" />
-                        </div>
-                    ))}
-                </div>
-
-                {/* Bottom Conveyor */}
-                <div className="absolute bottom-[20%] left-0 w-full h-3 bg-gradient-to-r from-transparent via-blue-400/30 to-transparent overflow-hidden">
-                    <div className="conveyor-line h-full" style={{ animationDuration: '22s' }} />
-                </div>
-            </div>
-
-            {/* Trucks Moving Along Road */}
-            <div className="absolute bottom-[35%] left-0 w-full">
-                {[...Array(3)].map((_, i) => (
-                    <div
-                        key={`truck-${i}`}
-                        className="absolute"
-                        style={{
-                            left: `${i * 40}%`,
-                            animation: `conveyor-move 25s linear infinite`,
-                            animationDelay: `${i * 8}s`,
-                        }}
-                    >
-                        {/* Truck Body */}
-                        <div className="flex items-end">
-                            {/* Cargo Container */}
-                            <div className="w-16 h-12 bg-gradient-to-b from-blue-500/40 to-blue-600/50 border-2 border-blue-400/60 rounded-sm relative">
-                                <div className="absolute inset-1 border border-blue-300/30" />
-                                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-1 bg-blue-300/50" />
-                            </div>
-                            {/* Cab */}
-                            <div className="w-8 h-8 bg-gradient-to-br from-cyan-500/40 to-cyan-600/50 border-2 border-cyan-400/60 rounded-sm relative ml-0.5">
-                                <div className="absolute top-1 left-1 w-1.5 h-1.5 bg-yellow-300/70 rounded-full" />
-                            </div>
-                        </div>
-                        {/* Wheels */}
-                        <div className="flex justify-between w-24 mt-0.5">
-                            <div className="w-2 h-2 bg-slate-800/60 border border-slate-600/60 rounded-full" />
-                            <div className="w-2 h-2 bg-slate-800/60 border border-slate-600/60 rounded-full" />
-                            <div className="w-2 h-2 bg-slate-800/60 border border-slate-600/60 rounded-full" />
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Forklifts */}
-            <div className="absolute bottom-[15%] left-0 w-full">
-                {[...Array(2)].map((_, i) => (
-                    <div
-                        key={`forklift-${i}`}
-                        className="absolute"
-                        style={{
-                            left: `${20 + i * 50}%`,
-                            animation: `conveyor-move 30s linear infinite`,
-                            animationDelay: `${i * 15}s`,
-                        }}
-                    >
-                        <div className="relative">
-                            {/* Fork */}
-                            <div className="absolute bottom-full left-0 w-1 h-8 bg-orange-400/60 border-l border-orange-300/40" />
-                            {/* Body */}
-                            <div className="w-10 h-6 bg-gradient-to-br from-orange-500/40 to-orange-600/50 border-2 border-orange-400/60 rounded-sm" />
-                            {/* Wheels */}
-                            <div className="flex justify-between w-10">
-                                <div className="w-2 h-2 bg-slate-800/60 border border-slate-600/60 rounded-full" />
-                                <div className="w-2 h-2 bg-slate-800/60 border border-slate-600/60 rounded-full" />
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {/* Supply Chain Network */}
-            <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                {/* Network Nodes */}
-                <circle cx="10%" cy="25%" r="10" fill="rgba(0, 240, 255, 0.5)">
-                    <animate attributeName="r" values="10;14;10" dur="3s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" repeatCount="indefinite" />
-                </circle>
-
-                <circle cx="30%" cy="45%" r="10" fill="rgba(255, 170, 0, 0.5)">
-                    <animate attributeName="r" values="10;14;10" dur="3s" begin="1s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" begin="1s" repeatCount="indefinite" />
-                </circle>
-
-                <circle cx="70%" cy="35%" r="10" fill="rgba(59, 130, 246, 0.5)">
-                    <animate attributeName="r" values="10;14;10" dur="3s" begin="2s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" begin="2s" repeatCount="indefinite" />
-                </circle>
-
-                <circle cx="90%" cy="65%" r="10" fill="rgba(0, 240, 255, 0.5)">
-                    <animate attributeName="r" values="10;14;10" dur="3s" begin="1.5s" repeatCount="indefinite" />
-                    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" begin="1.5s" repeatCount="indefinite" />
-                </circle>
-
-                {/* Connection Lines */}
-                <line x1="10%" y1="25%" x2="30%" y2="45%" stroke="rgba(0, 240, 255, 0.3)" strokeWidth="2" strokeDasharray="5,5">
-                    <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2s" repeatCount="indefinite" />
-                </line>
-
-                <line x1="30%" y1="45%" x2="70%" y2="35%" stroke="rgba(255, 170, 0, 0.3)" strokeWidth="2" strokeDasharray="5,5">
-                    <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2s" repeatCount="indefinite" />
-                </line>
-
-                <line x1="70%" y1="35%" x2="90%" y2="65%" stroke="rgba(59, 130, 246, 0.3)" strokeWidth="2" strokeDasharray="5,5">
-                    <animate attributeName="stroke-dashoffset" from="0" to="10" dur="2s" repeatCount="indefinite" />
-                </line>
-            </svg>
-
-            {/* Robotic Assembly Arms - More Visible */}
-            <div className="absolute right-[10%] top-[30%]">
-                <div className="robot-arm w-40 h-4 bg-gradient-to-r from-cyan-500/40 to-cyan-400/50 rounded-full shadow-lg border border-cyan-300/30">
-                    <div className="absolute right-0 w-28 h-4 bg-gradient-to-r from-orange-500/40 to-orange-400/50 rounded-full origin-left robot-arm-2 border border-orange-300/30 shadow-lg" />
-                </div>
-            </div>
-
-            <div className="absolute left-[15%] top-[60%]">
-                <div className="robot-arm w-36 h-4 bg-gradient-to-r from-blue-500/40 to-blue-400/50 rounded-full shadow-lg border border-blue-300/30" style={{ animationDelay: '1.5s' }}>
-                    <div className="absolute right-0 w-24 h-4 bg-gradient-to-r from-purple-500/40 to-purple-400/50 rounded-full origin-left robot-arm-2 border border-purple-300/30 shadow-lg" style={{ animationDelay: '1.5s' }} />
-                </div>
-            </div>
-
-            <div className="absolute right-[20%] bottom-[30%]">
-                <div className="robot-arm w-32 h-4 bg-gradient-to-r from-green-500/40 to-green-400/50 rounded-full shadow-lg border border-green-300/30" style={{ animationDelay: '3s' }}>
-                    <div className="absolute right-0 w-20 h-4 bg-gradient-to-r from-yellow-500/40 to-yellow-400/50 rounded-full origin-left robot-arm-2 border border-yellow-300/30 shadow-lg" style={{ animationDelay: '3s' }} />
-                </div>
-            </div>
-
-            {/* Warehouse/Factory Icons */}
-            <div className="absolute left-[5%] top-[20%]">
-                <div className="w-16 h-20 border-2 border-cyan-400/40 bg-slate-800/20 relative">
-                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full border-l-8 border-r-8 border-b-8 border-transparent border-b-cyan-400/40 w-0 h-0" />
-                    <div className="grid grid-cols-2 gap-1 p-2">
-                        {[...Array(6)].map((_, i) => (
-                            <div key={i} className="w-full h-3 bg-yellow-300/30 border border-yellow-200/20" />
-                        ))}
-                    </div>
-                </div>
-            </div>
+        <div
+            className={`${
+                fixed ? "fixed" : "absolute"
+            } inset-0 overflow-hidden pointer-events-none z-0 opacity-85 dark:opacity-70`}
+        >
+            <canvas ref={canvasRef} className="w-full h-full block" />
         </div>
     );
 }
